@@ -4,20 +4,26 @@
 namespace Loyalty\UseCases;
 
 use DateTime;
-use Loyalty\Boundaries\GetPointsBalanceGatewayInterface;
+use Exception;
 
 class GetPointsBalance
 {
-    private GetPointsBalanceGatewayInterface $gateway;
+    private GetActivePoints $getActivePoints;
 
-    public function __construct(GetPointsBalanceGatewayInterface $gateway)
+    public function __construct(GetActivePoints $getActivePoints)
     {
-        $this->gateway = $gateway;
+        $this->getActivePoints = $getActivePoints;
     }
 
+    /**
+     * @param string $userId
+     * @param DateTime $requestedDate
+     * @return int
+     * @throws Exception
+     */
     public function execute(string $userId, DateTime $requestedDate): int
     {
-        $nonExpiredActions = $this->gateway->getPointsForUserSinceDate($userId, $requestedDate);
+        $nonExpiredActions = $this->getActivePoints->execute($userId, $requestedDate);
         $activePointsOfNonExpiredActions = array_column($nonExpiredActions, "activePoints");
         return array_sum($activePointsOfNonExpiredActions);
     }
