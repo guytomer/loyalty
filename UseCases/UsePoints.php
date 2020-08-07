@@ -13,14 +13,14 @@ class UsePoints
 {
     private UsePointsGatewayInterface $usePointsGateway;
     private Clock $clock;
-    private GetActivePoints $getActivePoints;
+    private GetActiveActions $getActiveActions;
 
     public function __construct(UsePointsGatewayInterface $usePointsGateway,
-                                GetActivePoints $getActivePoints,
+                                GetActiveActions $getActiveActions,
                                 Clock $clock)
     {
         $this->usePointsGateway = $usePointsGateway;
-        $this->getActivePoints = $getActivePoints;
+        $this->getActiveActions = $getActiveActions;
         $this->clock = $clock;
     }
 
@@ -53,7 +53,7 @@ class UsePoints
      */
     private function validateUserHasEnoughPoints(string $userId, int $points)
     {
-        $getPointsBalance = new GetPointsBalance($this->getActivePoints);
+        $getPointsBalance = new GetPointsBalance($this->getActiveActions);
         $currentUserPoints = $getPointsBalance->execute($userId, $this->clock->now());
         if ($points > $currentUserPoints) throw new InsufficientPointsException;
     }
@@ -65,7 +65,7 @@ class UsePoints
      */
     private function createUsage(string $userId, int $points)
     {
-        $actions = $this->getActivePoints->execute($userId, $this->clock->now());
+        $actions = $this->getActiveActions->execute($userId, $this->clock->now());
         $reductionResult = $this->reduceActions($actions, $points);
         $this->usePointsGateway->createPointsUsage($reductionResult["reductions"]);
         $this->usePointsGateway->updateActions($reductionResult["actions"]);

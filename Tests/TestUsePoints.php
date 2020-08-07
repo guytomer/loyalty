@@ -7,7 +7,7 @@ use Exception;
 use Loyalty\Boundaries\UsePointsGatewayInterface;
 use Loyalty\Exceptions\InsufficientPointsException;
 use Loyalty\Exceptions\InvalidPointsException;
-use Loyalty\UseCases\GetActivePoints;
+use Loyalty\UseCases\GetActiveActions;
 use Loyalty\UseCases\UsePoints;
 
 class TestUsePoints {
@@ -37,7 +37,7 @@ class TestUsePoints {
 
     function testUsingNegativePoints(): bool
     {
-        $usePoints = new UsePoints($this->usePointsGateway(), $this->getActivePoints([]), new TestClock);
+        $usePoints = new UsePoints($this->usePointsGateway(), $this->getActiveActions([]), new TestClock);
         try {
             $usePoints->execute("1", -10);
         } catch (InvalidPointsException $exception) {
@@ -55,7 +55,7 @@ class TestUsePoints {
             ["userId" => "1", "awardedPoints" => 50, "activePoints" => 20, "expiryDate" => "2020-01-03"],
         ];
         $usePoints = new UsePoints($this->usePointsGateway(),
-            $this->getActivePoints($actions),
+            $this->getActiveActions($actions),
             new TestClock(new DateTime("2020-01-01")));
         try {
             $usePoints->execute("1", 46);
@@ -76,7 +76,7 @@ class TestUsePoints {
         ];
         $usePointsGateway = $this->usePointsGateway();
         $clock = new TestClock(new DateTime("2020-01-01"));
-        $usePoints = new UsePoints($usePointsGateway, $this->getActivePoints($actions), $clock);
+        $usePoints = new UsePoints($usePointsGateway, $this->getActiveActions($actions), $clock);
         try {
             $usePoints->execute("1", 55);
             $actionsWereAltered = $usePointsGateway->actions == [
@@ -96,9 +96,9 @@ class TestUsePoints {
         return false;
     }
 
-    private function getActivePoints(array $actions): GetActivePoints
+    private function getActiveActions(array $actions): GetActiveActions
     {
         $actionsGateway = new TestActionsGateway($actions);
-        return new GetActivePoints($actionsGateway);
+        return new GetActiveActions($actionsGateway);
     }
 }

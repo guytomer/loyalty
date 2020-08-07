@@ -4,14 +4,14 @@ namespace Loyalty\Tests;
 
 use DateTime;
 use Exception;
-use Loyalty\UseCases\GetActivePoints;
+use Loyalty\UseCases\GetActiveActions;
 use Loyalty\UseCases\GetPointsBalance;
 
 class TestGetPointsBalance
 {
     function testZeroBalance(): bool
     {
-        $getPointsBalance = new GetPointsBalance($this->getActivePoints([]));
+        $getPointsBalance = new GetPointsBalance($this->getActiveActions([]));
         try {
             $balance = $getPointsBalance->execute("1", new DateTime("2020-01-01"));
             return $balance === 0;
@@ -26,7 +26,7 @@ class TestGetPointsBalance
             ["userId" => "1", "awardedPoints" => 50, "activePoints" => 25, "expiryDate" => "2020-01-01"],
             ["userId" => "1", "awardedPoints" => 50, "activePoints" => 20, "expiryDate" => "2020-01-03"],
         ];
-        $getPointsBalance = new GetPointsBalance($this->getActivePoints($actions));
+        $getPointsBalance = new GetPointsBalance($this->getActiveActions($actions));
         try {
             $balance = $getPointsBalance->execute("1", new DateTime("2020-01-01"));
             return $balance === 45;
@@ -41,7 +41,7 @@ class TestGetPointsBalance
             ["userId" => "1", "awardedPoints" => 50, "activePoints" => 25, "expiryDate" => "2020-01-01"],
             ["userId" => "1", "awardedPoints" => 50, "activePoints" => 20, "expiryDate" => "2019-12-31"],
         ];
-        $getPointsBalance = new GetPointsBalance($this->getActivePoints($actions));
+        $getPointsBalance = new GetPointsBalance($this->getActiveActions($actions));
         try {
             $balance = $getPointsBalance->execute("1", new DateTime("2020-01-01"));
             return $balance === 25;
@@ -56,7 +56,7 @@ class TestGetPointsBalance
             ["userId" => "1", "awardedPoints" => 50, "activePoints" => 25, "expiryDate" => "2020-01-01"],
             ["userId" => "2", "awardedPoints" => 50, "activePoints" => 20, "expiryDate" => "2020-01-01"],
         ];
-        $getPointsBalance = new GetPointsBalance($this->getActivePoints($actions));
+        $getPointsBalance = new GetPointsBalance($this->getActiveActions($actions));
         try {
             $balance = $getPointsBalance->execute("1", new DateTime("2020-01-01"));
             return $balance === 25;
@@ -65,9 +65,9 @@ class TestGetPointsBalance
         return false;
     }
 
-    private function getActivePoints(array $actions): GetActivePoints
+    private function getActiveActions(array $actions): GetActiveActions
     {
         $actionsGateway = new TestActionsGateway($actions);
-        return new GetActivePoints($actionsGateway);
+        return new GetActiveActions($actionsGateway);
     }
 }

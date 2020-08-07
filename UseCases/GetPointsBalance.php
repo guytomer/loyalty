@@ -8,11 +8,11 @@ use Exception;
 
 class GetPointsBalance
 {
-    private GetActivePoints $getActivePoints;
+    private GetActiveActions $getActiveActions;
 
-    public function __construct(GetActivePoints $getActivePoints)
+    public function __construct(GetActiveActions $getActiveActions)
     {
-        $this->getActivePoints = $getActivePoints;
+        $this->getActiveActions = $getActiveActions;
     }
 
     /**
@@ -23,7 +23,7 @@ class GetPointsBalance
      */
     public function execute(string $userId, DateTime $requestedDate): int
     {
-        $nonExpiredActions = $this->getActivePoints->execute($userId, $requestedDate);
+        $nonExpiredActions = $this->getActiveActions->execute($userId, $requestedDate);
         $activePointsOfNonExpiredActions = array_column($nonExpiredActions, "activePoints");
         return array_sum($activePointsOfNonExpiredActions);
     }

@@ -7,7 +7,7 @@ use DateTime;
 use Exception;
 use Loyalty\Boundaries\ActionsGatewayInterface;
 
-class GetActivePoints
+class GetActiveActions
 {
     private ActionsGatewayInterface $gateway;
 
