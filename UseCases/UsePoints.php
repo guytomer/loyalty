@@ -81,7 +81,7 @@ class UsePoints
             $actionReduction = $points >= $action["activePoints"] ? $action["activePoints"] : $points;
             if ($actionReduction) {
                 $action["activePoints"] -= $actionReduction;
-                $reductions[] = ["id" => $action["id"], "usedPoints" => $actionReduction];
+                $reductions[] = ["actionId" => $action["id"], "usedPoints" => $actionReduction];
                 $actions[] = $action;
             }
             return [

@@ -84,8 +84,8 @@ class TestUsePoints {
                 ["id" => "2", "userId" => "1", "awardedPoints" => 50, "activePoints" => 35, "expiryDate" => "2020-01-03"]
             ];
             $usageWasCreated = $usePointsGateway->reductions == [
-                ["id" => "1", "usedPoints" => 40],
-                ["id" => "2", "usedPoints" => 15]
+                ["actionId" => "1", "usedPoints" => 40],
+                ["actionId" => "2", "usedPoints" => 15]
             ];
             $transactionWasCommitted = $usePointsGateway->committed;
             return $actionsWereAltered && $usageWasCreated && $transactionWasCommitted;
