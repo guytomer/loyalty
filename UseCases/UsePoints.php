@@ -4,7 +4,6 @@
 namespace Loyalty\UseCases;
 
 
-use DateTime;
 use Exception;
 use Loyalty\Boundaries\UsePointsGatewayInterface;
 use Loyalty\Exceptions\InsufficientPointsException;
@@ -30,6 +29,7 @@ class UsePoints
     /**
      * @param string $userId
      * @param int $points
+     * @return string
      * @throws InvalidPointsException|InsufficientPointsException
      * @throws Exception
      */
@@ -65,7 +65,6 @@ class UsePoints
     /**
      * @param string $userId
      * @param int $points
-     * @param DateTime $date
      * @return string
      * @throws Exception
      */

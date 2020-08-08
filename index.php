@@ -17,7 +17,7 @@ use Loyalty\UseCases\UsePoints;
 
 $hostname = "localhost";
 $username = "root";
-$password = "8M2w5nFNzBPdCb3W";
+$password = "";
 $pdo = new PDO("mysql:host=$hostname;dbname=loyalty", $username, $password);
 $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
