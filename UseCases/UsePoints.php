@@ -4,6 +4,7 @@
 namespace Loyalty\UseCases;
 
 
+use DateTime;
 use Exception;
 use Loyalty\Boundaries\UsePointsGatewayInterface;
 use Loyalty\Exceptions\InsufficientPointsException;
@@ -12,6 +13,7 @@ use Loyalty\Exceptions\InvalidPointsException;
 class UsePoints
 {
     use ActionReducer;
+
     private UsePointsGatewayInterface $usePointsGateway;
     private Clock $clock;
     private GetActiveActions $getActiveActions;
@@ -31,10 +33,11 @@ class UsePoints
      * @throws InvalidPointsException|InsufficientPointsException
      * @throws Exception
      */
-    public function execute(string $userId, int $points) {
+    public function execute(string $userId, int $points): string
+    {
         $this->validateUsedPoints($points);
         $this->validateUserHasEnoughPoints($userId, $points);
-        $this->createUsage($userId, $points);
+        return $this->createUsage($userId, $points);
     }
 
     /**
@@ -62,14 +65,17 @@ class UsePoints
     /**
      * @param string $userId
      * @param int $points
+     * @param DateTime $date
+     * @return string
      * @throws Exception
      */
-    private function createUsage(string $userId, int $points)
+    private function createUsage(string $userId, int $points): string
     {
         $actions = $this->getActiveActions->execute($userId, $this->clock->now());
         $reductionResult = $this->reduceActions($actions, $points);
-        $this->usePointsGateway->createPointsUsage($reductionResult["reductions"]);
+        $usageId = $this->usePointsGateway->createPointsUsage($userId, $reductionResult["reductions"], $this->clock->now());
         $this->usePointsGateway->updateActions($reductionResult["actions"]);
         $this->usePointsGateway->commit();
+        return $usageId;
     }
 }

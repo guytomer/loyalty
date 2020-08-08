@@ -24,9 +24,10 @@ class TestUsePoints {
                 $this->actions = $actions;
             }
 
-            public function createPointsUsage(array $reductions)
+            public function createPointsUsage(string $userId, array $reductions, DateTime $date): string
             {
                 $this->reductions = $reductions;
+                return "";
             }
 
             public function commit()
