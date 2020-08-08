@@ -7,6 +7,7 @@ use Exception;
 use Loyalty\Boundaries\UsePointsGatewayInterface;
 use Loyalty\Exceptions\InsufficientPointsException;
 use Loyalty\Exceptions\InvalidPointsException;
+use Loyalty\UseCases\Clock;
 use Loyalty\UseCases\GetActiveActions;
 use Loyalty\UseCases\UsePoints;
 
@@ -37,7 +38,7 @@ class TestUsePoints {
 
     function testUsingNegativePoints(): bool
     {
-        $usePoints = new UsePoints($this->usePointsGateway(), $this->getActiveActions([]), new TestClock);
+        $usePoints = new UsePoints($this->usePointsGateway(), $this->getActiveActions([]), new Clock);
         try {
             $usePoints->execute("1", -10);
         } catch (InvalidPointsException $exception) {
@@ -56,7 +57,7 @@ class TestUsePoints {
         ];
         $usePoints = new UsePoints($this->usePointsGateway(),
             $this->getActiveActions($actions),
-            new TestClock(new DateTime("2020-01-01")));
+            new Clock(new DateTime("2020-01-01")));
         try {
             $usePoints->execute("1", 46);
         } catch (InsufficientPointsException $exception) {
@@ -75,7 +76,7 @@ class TestUsePoints {
             ["id" => "3", "userId" => "1", "awardedPoints" => 50, "activePoints" => 50, "expiryDate" => "2020-01-04"]
         ];
         $usePointsGateway = $this->usePointsGateway();
-        $clock = new TestClock(new DateTime("2020-01-01"));
+        $clock = new Clock(new DateTime("2020-01-01"));
         $usePoints = new UsePoints($usePointsGateway, $this->getActiveActions($actions), $clock);
         try {
             $usePoints->execute("1", 55);

@@ -8,6 +8,7 @@ use DateTime;
 use Exception;
 use Loyalty\Boundaries\RefundPointsGatewayInterface;
 use Loyalty\Exceptions\InvalidPointsException;
+use Loyalty\Exceptions\UsageNotFoundException;
 
 class RefundPoints
 {
@@ -24,6 +25,7 @@ class RefundPoints
      * @param string $usageId
      * @param int $points
      * @throws InvalidPointsException
+     * @throws UsageNotFoundException
      * @throws Exception
      */
     public function execute(string $usageId, int $points) {
@@ -110,9 +112,14 @@ class RefundPoints
         });
     }
 
+    /**
+     * @param string $usageId
+     * @throws UsageNotFoundException
+     */
     private function fetchAffectedActions(string $usageId)
     {
         $this->affectedActions = $this->refundPointsGateway->getAffectedActions($usageId);
+        if (!$this->affectedActions) throw new UsageNotFoundException;
     }
 
 }

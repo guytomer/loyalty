@@ -8,7 +8,15 @@ use DateTime;
 
 class Clock
 {
-    public function now() {
-        return new DateTime;
+    private DateTime $date;
+
+    public function __construct(?DateTime $date = null)
+    {
+        $this->date = $date ?? new DateTime;
+    }
+
+    public function now()
+    {
+        return $this->date;
     }
 }

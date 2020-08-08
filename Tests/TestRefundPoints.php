@@ -30,8 +30,7 @@ class TestRefundPoints
                 $usage = current(array_filter($this->usages, function ($usage) use ($usageId) {
                     return $usage["id"] === $usageId;
                 }));
-                if (!$usage) throw new UsageNotFoundException;
-                return $usage["reductions"];
+                return $usage ? $usage["reductions"] : [];
             }
 
             public function getAffectedActions(string $usageId): array
@@ -108,7 +107,7 @@ class TestRefundPoints
     function testRefundPointsExceedUsagePoints(): bool
     {
         try {
-            $refundPoints = new RefundPoints($this->refundPointsGateway($this->usages(), []));
+            $refundPoints = new RefundPoints($this->refundPointsGateway($this->usages(), $this->actions()));
             $refundPoints->execute("1", 56);
         } catch (InvalidPointsException $exception) {
             return true;
