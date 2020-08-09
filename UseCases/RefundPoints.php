@@ -58,29 +58,8 @@ class RefundPoints
 
     private function refundPoints(string $usageId, int $points)
     {
-        $affectedActions = $this->affectedActions;
-        $refundResult =  array_reduce($this->usageReductions, function ($currentState, $reduction) use ($affectedActions) {
-            $points = $currentState["points"];
-            $reductions = $currentState["reductions"];
-            $actions = $currentState["actions"];
-            $actionIncrease = $points >= $reduction["usedPoints"] ? $reduction["usedPoints"] : $points;
-            $actionId = $reduction["actionId"];
-            $action = current(array_filter($affectedActions, function ($action) use ($actionId) {
-                return $action["id"] === $actionId;
-            }));
-            if ($actionIncrease) {
-                $action["activePoints"] += $actionIncrease;
-                $alteredUsedPoints = $reduction["usedPoints"] - $actionIncrease;
-                if ($alteredUsedPoints) $reductions[] = ["id" => $action["id"], "usedPoints" => $alteredUsedPoints];
-                $actions[] = $action;
-            }
-            return [
-                "points" => $points - $actionIncrease,
-                "reductions" => $reductions,
-                "actions" => $actions
-            ];
-        }, ["points" => $points, "reductions" => [], "actions" => []]);
         $this->refundPointsGateway->createRefund($usageId, $points);
+        $refundResult = $this->calculateRefund($points);
         $this->refundPointsGateway->updateUsage($usageId, $refundResult["reductions"]);
         $this->refundPointsGateway->updateActions($refundResult["actions"]);
         $this->refundPointsGateway->commit();
@@ -122,4 +101,29 @@ class RefundPoints
         if (!$this->affectedActions) throw new UsageNotFoundException;
     }
 
+    private function calculateRefund(int $points): array
+    {
+        $affectedActions = $this->affectedActions;
+        return array_reduce($this->usageReductions, function ($currentState, $reduction) use ($affectedActions) {
+            $points = $currentState["points"];
+            $reductions = $currentState["reductions"];
+            $actions = $currentState["actions"];
+            $actionIncrease = $points >= $reduction["usedPoints"] ? $reduction["usedPoints"] : $points;
+            $actionId = $reduction["actionId"];
+            $action = current(array_filter($affectedActions, function ($action) use ($actionId) {
+                return $action["id"] === $actionId;
+            }));
+            if ($actionIncrease) {
+                $action["activePoints"] += $actionIncrease;
+                $alteredUsedPoints = $reduction["usedPoints"] - $actionIncrease;
+                if ($alteredUsedPoints) $reductions[] = ["id" => $action["id"], "usedPoints" => $alteredUsedPoints];
+                $actions[] = $action;
+            }
+            return [
+                "points" => $points - $actionIncrease,
+                "reductions" => $reductions,
+                "actions" => $actions
+            ];
+        }, ["points" => $points, "reductions" => [], "actions" => []]);
+    }
 }
