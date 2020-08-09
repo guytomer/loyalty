@@ -62,7 +62,7 @@ class MySqlCancelUsageGateway implements CancelUsageGatewayInterface
         $statement->execute(["usageId" => $usageId]);
     }
 
-    public function commit()
+    public function __destruct()
     {
         $this->pdo->commit();
     }

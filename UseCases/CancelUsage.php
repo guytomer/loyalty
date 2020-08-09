@@ -34,7 +34,6 @@ class CancelUsage
         $this->resetActionsToAwardedPoints($usagesForAlteration);
         $this->recreateUsages($usagesForAlteration, $usageId);
         $this->cancelUsageGateway->cancelUsage($usageId);
-        $this->cancelUsageGateway->commit();
     }
 
     /**

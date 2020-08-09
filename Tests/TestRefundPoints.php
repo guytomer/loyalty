@@ -17,7 +17,6 @@ class TestRefundPoints
             public array $usages;
             public array $actions;
             public array $refund = [];
-            public bool $committed = false;
 
             public function __construct(array $usages, array $actions)
             {
@@ -71,11 +70,6 @@ class TestRefundPoints
                     $actionBExpiry = new DateTime($actionB["expiryDate"]);
                     return $actionAExpiry <=> $actionBExpiry;
                 });
-            }
-
-            public function commit()
-            {
-                $this->committed = true;
             }
         };
     }
@@ -137,8 +131,7 @@ class TestRefundPoints
                     ["actionId" => "9", "usedPoints" => 20]
                 ]]
             ];
-            $committed = $refundPointsGateway->committed;
-            return $refundWasCreated && $actionsWereAltered && $usageWasAltered && $committed;
+            return $refundWasCreated && $actionsWereAltered && $usageWasAltered;
         } catch (Exception $e) {
         }
         return false;
@@ -163,8 +156,7 @@ class TestRefundPoints
                     ["actionId" => "9", "usedPoints" => 20]
                 ]]
             ];
-            $committed = $refundPointsGateway->committed;
-            return $refundWasCreated && $actionsWereAltered && $usageWasAltered && $committed;
+            return $refundWasCreated && $actionsWereAltered && $usageWasAltered;
         } catch (Exception $e) {
         }
         return false;

@@ -15,6 +15,4 @@ interface RefundPointsGatewayInterface
     public function updateUsage(string $usageId, $reductions);
 
     public function updateActions($actions);
-
-    public function commit();
 }

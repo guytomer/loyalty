@@ -17,7 +17,6 @@ class TestUsePoints {
         return new class implements UsePointsGatewayInterface {
             public array $actions = [];
             public array $reductions = [];
-            public bool $committed = false;
 
             public function updateActions(array $actions)
             {
@@ -28,11 +27,6 @@ class TestUsePoints {
             {
                 $this->reductions = $reductions;
                 return "";
-            }
-
-            public function commit()
-            {
-                $this->committed = true;
             }
         };
     }
@@ -89,8 +83,7 @@ class TestUsePoints {
                 ["actionId" => "1", "usedPoints" => 40],
                 ["actionId" => "2", "usedPoints" => 15]
             ];
-            $transactionWasCommitted = $usePointsGateway->committed;
-            return $actionsWereAltered && $usageWasCreated && $transactionWasCommitted;
+            return $actionsWereAltered && $usageWasCreated;
         } catch (InsufficientPointsException $exception) {
         } catch (InvalidPointsException $e) {
         } catch (Exception $e) {

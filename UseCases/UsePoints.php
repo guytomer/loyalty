@@ -74,7 +74,6 @@ class UsePoints
         $reductionResult = $this->reduceActions($actions, $points);
         $usageId = $this->usePointsGateway->createPointsUsage($userId, $reductionResult["reductions"], $this->clock->now());
         $this->usePointsGateway->updateActions($reductionResult["actions"]);
-        $this->usePointsGateway->commit();
         return $usageId;
     }
 }

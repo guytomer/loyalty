@@ -27,7 +27,6 @@ class TestCancelUsage
             public array $usages;
             public array $actions;
             public ?string $canceledUsageId = null;
-            public bool $committed = false;
 
             public function __construct(array $usages, array $actions)
             {
@@ -57,11 +56,6 @@ class TestCancelUsage
             public function updateUsages(array $usages)
             {
                 $this->usages = $usages;
-            }
-
-            public function commit()
-            {
-                $this->committed = true;
             }
 
             public function cancelUsage(string $usageId)
@@ -97,8 +91,7 @@ class TestCancelUsage
                     ["id" => "5", "userId" => "1", "awardedPoints" => 50, "activePoints" => 40, "expiryDate" => "2020-01-05"],
                     ["id" => "6", "userId" => "1", "awardedPoints" => 40, "activePoints" => 40, "expiryDate" => "2020-01-05"]
                 ];
-            $committed = $cancelUsageGateway->committed;
-            return $usageWasCanceled && $remainingUsagesWereAltered && $actionsWereAltered && $committed;
+            return $usageWasCanceled && $remainingUsagesWereAltered && $actionsWereAltered;
         } catch (Exception $e) {
         }
         return false;

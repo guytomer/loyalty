@@ -62,7 +62,6 @@ class RefundPoints
         $refundResult = $this->calculateRefund($points);
         $this->refundPointsGateway->updateUsage($usageId, $refundResult["reductions"]);
         $this->refundPointsGateway->updateActions($refundResult["actions"]);
-        $this->refundPointsGateway->commit();
     }
 
     /**

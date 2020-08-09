@@ -34,7 +34,7 @@ class MySqlUsePointsGateway implements UsePointsGatewayInterface
         ]);
     }
 
-    public function commit()
+    public function __destruct()
     {
         $this->pdo->commit();
     }

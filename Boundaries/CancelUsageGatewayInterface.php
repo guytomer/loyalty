@@ -14,7 +14,5 @@ interface CancelUsageGatewayInterface
 
     public function updateUsages(array $usages);
 
-    public function commit();
-
     public function cancelUsage(string $usageId);
 }

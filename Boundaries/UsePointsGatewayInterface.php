@@ -11,6 +11,4 @@ interface UsePointsGatewayInterface
     public function createPointsUsage(string $userId, array $reductions, DateTime $date): string;
 
     public function updateActions(array $actions);
-
-    public function commit();
 }
