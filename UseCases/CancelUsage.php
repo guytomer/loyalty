@@ -31,11 +31,19 @@ class CancelUsage
     {
         $usagesForAlteration = $this->cancelUsageGateway->getUsagesForAlteration($usageId);
         $this->validateUsages($usagesForAlteration);
-        $this->setUsagesForRecreation($usagesForAlteration, $usageId);
         $this->resetActionsToAwardedPoints($usagesForAlteration);
-        $this->recreateUsages();
+        $this->recreateUsages($usagesForAlteration, $usageId);
         $this->cancelUsageGateway->cancelUsage($usageId);
         $this->cancelUsageGateway->commit();
+    }
+
+    /**
+     * @param array $usagesForAlteration
+     * @throws UsageNotFoundException
+     */
+    private function validateUsages(array $usagesForAlteration): void
+    {
+        if (!$usagesForAlteration) throw new UsageNotFoundException;
     }
 
     private function resetActionsToAwardedPoints(array $usagesForAlteration)
@@ -58,25 +66,45 @@ class CancelUsage
     }
 
     /**
+     * @param array $usagesForAlteration
+     * @param string $usageId
      * @throws Exception
      */
-    private function recreateUsages()
+    private function recreateUsages(array $usagesForAlteration, string $usageId)
     {
-        foreach ($this->usagesForRecreation as $usage) {
-            $usageDate = new DateTime($usage["date"]);
-            $usagePoints = array_sum(array_column($usage["reductions"], "usedPoints"));
-            $actions = array_filter($this->actions, function ($action) use ($usageDate) {
-                $actionExpiryDate = new DateTime($action["expiryDate"]);
-                $actionHasPoints = $action["activePoints"];
-                return $actionExpiryDate >= $usageDate && $actionHasPoints;
-            });
-            $reductionResult = $this->reduceActions($actions, $usagePoints);
-            $usage["reductions"] = $reductionResult["reductions"];
-            $this->updateActions($reductionResult["actions"]);
-            $this->updateUsages($usage);
-        }
+        $this->setUsagesForRecreation($usagesForAlteration, $usageId);
+        foreach ($this->usagesForRecreation as $usage) $this->recreateUsage($usage);
         $this->cancelUsageGateway->updateActions($this->actions);
         $this->cancelUsageGateway->updateUsages($this->usagesForRecreation);
+    }
+
+    /**
+     * @param $usage
+     * @throws Exception
+     */
+    private function recreateUsage($usage): void
+    {
+        $usageDate = new DateTime($usage["date"]);
+        $usagePoints = array_sum(array_column($usage["reductions"], "usedPoints"));
+        $activeActionsInDate = $this->getActiveActionsInDate($usageDate);
+        $reductionResult = $this->reduceActions($activeActionsInDate, $usagePoints);
+        $usage["reductions"] = $reductionResult["reductions"];
+        $this->updateActions($reductionResult["actions"]);
+        $this->updateUsages($usage);
+    }
+
+    /**
+     * @param DateTime $usageDate
+     * @return array
+     * @throws Exception
+     */
+    private function getActiveActionsInDate(DateTime $usageDate): array
+    {
+        return array_filter($this->actions, function ($action) use ($usageDate) {
+            $actionExpiryDate = new DateTime($action["expiryDate"]);
+            $actionHasPoints = $action["activePoints"];
+            return $actionExpiryDate >= $usageDate && $actionHasPoints;
+        });
     }
 
     private function updateActions($actions)
@@ -101,15 +129,6 @@ class CancelUsage
         usort($this->usagesForRecreation, function ($usageA, $usageB) {
             return $usageA["id"] <=> $usageB["id"];
         });
-    }
-
-    /**
-     * @param array $usagesForAlteration
-     * @throws UsageNotFoundException
-     */
-    private function validateUsages(array $usagesForAlteration): void
-    {
-        if (!$usagesForAlteration) throw new UsageNotFoundException;
     }
 
     private function setUsagesForRecreation(array $usagesForAlteration, string $usageId): void
